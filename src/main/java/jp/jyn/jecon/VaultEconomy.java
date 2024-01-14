@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @PackagePrivate
 class VaultEconomy implements Economy {
@@ -162,9 +163,16 @@ class VaultEconomy implements Economy {
 
     private EconomyResponse withdrawPlayer(UUID uuid, double value) {
         double nowBalance = repository.getDouble(uuid).orElse(0);
-        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, -value, (nowBalance - value), nowBalance);
-        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
-        if (updateEvent.isCancelled) {
+
+        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
+        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
+            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, nowBalance, -value);
+
+            if (event.isCancelled) {
+                updateBalanceEventIsCancelled.set(true);
+            }
+        });
+        if (updateBalanceEventIsCancelled.get()) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
         }
 
@@ -203,9 +211,16 @@ class VaultEconomy implements Economy {
 
     private EconomyResponse depositPlayer(UUID uuid, double value) {
         double nowBalance = repository.getDouble(uuid).orElse(0);
-        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, value, (nowBalance + value), nowBalance);
-        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
-        if (updateEvent.isCancelled) {
+
+        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
+        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
+            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, nowBalance, value);
+
+            if (event.isCancelled) {
+                updateBalanceEventIsCancelled.set(true);
+            }
+        });
+        if (updateBalanceEventIsCancelled.get()) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
         }
 

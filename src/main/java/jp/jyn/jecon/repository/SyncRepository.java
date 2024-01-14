@@ -1,5 +1,6 @@
 package jp.jyn.jecon.repository;
 
+import jp.jyn.jecon.Jecon;
 import jp.jyn.jecon.api.BalanceUpdateEvent;
 import jp.jyn.jecon.config.MainConfig;
 import jp.jyn.jecon.db.Database;
@@ -7,6 +8,9 @@ import org.bukkit.Bukkit;
 
 import java.util.OptionalLong;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SyncRepository extends AbstractRepository {
     public SyncRepository(MainConfig config, Database db) {
@@ -31,9 +35,17 @@ public class SyncRepository extends AbstractRepository {
         }
 
         double doubleBalance = ((double) balance.getAsLong()) * 0.01;
-        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, amount *0.01, (doubleBalance + amount *0.01), doubleBalance);
-        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
-        if (updateEvent.isCancelled) return false;
+        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
+        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
+            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, doubleBalance, (double) amount *0.01);
+
+            if (event.isCancelled) {
+                updateBalanceEventIsCancelled.set(true);
+            }
+        });
+        if (updateBalanceEventIsCancelled.get()) {
+            return false;
+        }
 
         return db.deposit(getId(uuid), amount);
     }

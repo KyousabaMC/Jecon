@@ -4,12 +4,16 @@ import jp.jyn.jecon.Jecon;
 import jp.jyn.jecon.api.BalanceUpdateEvent;
 import jp.jyn.jecon.config.MainConfig;
 import jp.jyn.jecon.db.Database;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LazyRepository extends AbstractRepository {
     private final Map<UUID, OptionalLong> dbBalance;
@@ -95,9 +99,17 @@ public class LazyRepository extends AbstractRepository {
         }
 
         double doubleBalance = ((double) balance.getAsLong()) * 0.01;
-        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, amount *0.01, (doubleBalance + amount *0.01), doubleBalance);
-        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
-        if (updateEvent.isCancelled) return false;
+        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
+        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
+            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, doubleBalance, (double) amount *0.01);
+
+            if (event.isCancelled) {
+                updateBalanceEventIsCancelled.set(true);
+            }
+        });
+        if (updateBalanceEventIsCancelled.get()) {
+            return false;
+        }
 
         balanceCache.put(uuid, OptionalLong.of(balance.getAsLong() + amount));
         return true;
