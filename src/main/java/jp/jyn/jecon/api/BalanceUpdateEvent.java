@@ -14,10 +14,14 @@ public class BalanceUpdateEvent extends Event {
         previous = _previous;
     }
 
-    private HandlerList handlers = new HandlerList();
+    private static HandlerList handlers = new HandlerList();
 
     @Override
     public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 
