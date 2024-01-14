@@ -17,7 +17,7 @@ public class VersionChecker {
 
     private final boolean enable;
     private final MessageConfig message;
-    private final UpdateChecker checker = new GitHubReleaseChecker("HimaJyun", "Jecon");
+    private final UpdateChecker checker = new GitHubReleaseChecker("kuripasanda", "Jecon");
 
     private long nextCheck = 0;
     private String[] result = null;
