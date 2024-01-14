@@ -1,8 +1,10 @@
 package jp.jyn.jecon.repository;
 
 import jp.jyn.jecon.Jecon;
+import jp.jyn.jecon.api.BalanceUpdateEvent;
 import jp.jyn.jecon.config.MainConfig;
 import jp.jyn.jecon.db.Database;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,6 +93,11 @@ public class LazyRepository extends AbstractRepository {
         if (!balance.isPresent()) {
             return false;
         }
+
+        double doubleBalance = ((double) balance.getAsLong()) * 0.01;
+        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, amount *0.01, (doubleBalance + amount *0.01), doubleBalance);
+        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
+        if (updateEvent.isCancelled) return false;
 
         balanceCache.put(uuid, OptionalLong.of(balance.getAsLong() + amount));
         return true;
