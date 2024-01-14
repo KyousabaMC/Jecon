@@ -2,11 +2,13 @@ package jp.jyn.jecon;
 
 import jp.jyn.jbukkitlib.util.PackagePrivate;
 import jp.jyn.jbukkitlib.uuid.UUIDRegistry;
+import jp.jyn.jecon.api.BalanceUpdateEvent;
 import jp.jyn.jecon.config.MainConfig;
 import jp.jyn.jecon.repository.AbstractRepository;
 import jp.jyn.jecon.repository.BalanceRepository;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.math.BigDecimal;
@@ -159,12 +161,19 @@ class VaultEconomy implements Economy {
     }
 
     private EconomyResponse withdrawPlayer(UUID uuid, double value) {
+        double nowBalance = repository.getDouble(uuid).orElse(0);
+        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, -value, (nowBalance - value), nowBalance);
+        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
+        if (updateEvent.isCancelled) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
+        }
+
         if (value < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
         }
 
         if (repository.withdraw(uuid, value)) {
-            return new EconomyResponse(0, repository.getDouble(uuid).orElse(0), EconomyResponse.ResponseType.SUCCESS, "OK");
+            return new EconomyResponse(0, nowBalance, EconomyResponse.ResponseType.SUCCESS, "OK");
         } else {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Account does not exist");
         }
@@ -193,12 +202,19 @@ class VaultEconomy implements Economy {
     }
 
     private EconomyResponse depositPlayer(UUID uuid, double value) {
+        double nowBalance = repository.getDouble(uuid).orElse(0);
+        BalanceUpdateEvent updateEvent = new BalanceUpdateEvent(uuid, value, (nowBalance + value), nowBalance);
+        Bukkit.getServer().getPluginManager().callEvent(updateEvent);
+        if (updateEvent.isCancelled) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
+        }
+
         if (value < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
         }
 
         if (repository.deposit(uuid, value)) {
-            return new EconomyResponse(0, repository.getDouble(uuid).orElse(0), EconomyResponse.ResponseType.SUCCESS, "OK");
+            return new EconomyResponse(0, nowBalance, EconomyResponse.ResponseType.SUCCESS, "OK");
         } else {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Account does not exist");
         }
