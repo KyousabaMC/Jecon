@@ -164,18 +164,6 @@ class VaultEconomy implements Economy {
     private EconomyResponse withdrawPlayer(UUID uuid, double value) {
         double nowBalance = repository.getDouble(uuid).orElse(0);
 
-        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
-        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
-            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, nowBalance, -value);
-
-            if (event.isCancelled) {
-                updateBalanceEventIsCancelled.set(true);
-            }
-        });
-        if (updateBalanceEventIsCancelled.get()) {
-            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
-        }
-
         if (value < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
         }
@@ -211,18 +199,6 @@ class VaultEconomy implements Economy {
 
     private EconomyResponse depositPlayer(UUID uuid, double value) {
         double nowBalance = repository.getDouble(uuid).orElse(0);
-
-        AtomicBoolean updateBalanceEventIsCancelled = new AtomicBoolean(false);
-        Bukkit.getScheduler().runTask(Jecon.getInstance(), () -> {
-            BalanceUpdateEvent event = BalanceUpdateEvent.CallBalanceUpdateEvent(uuid, nowBalance, value);
-
-            if (event.isCancelled) {
-                updateBalanceEventIsCancelled.set(true);
-            }
-        });
-        if (updateBalanceEventIsCancelled.get()) {
-            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "This process has been canceled");
-        }
 
         if (value < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
