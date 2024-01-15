@@ -1,19 +1,21 @@
 package jp.jyn.jecon;
 
+import jp.jyn.jbukkitlib.command.SubCommand;
 import jp.jyn.jbukkitlib.command.SubExecutor;
 import jp.jyn.jbukkitlib.uuid.UUIDRegistry;
-import jp.jyn.jecon.command.Convert;
-import jp.jyn.jecon.command.Create;
-import jp.jyn.jecon.command.Give;
-import jp.jyn.jecon.command.Help;
-import jp.jyn.jecon.command.Pay;
-import jp.jyn.jecon.command.Reload;
-import jp.jyn.jecon.command.Remove;
-import jp.jyn.jecon.command.Set;
-import jp.jyn.jecon.command.Show;
-import jp.jyn.jecon.command.Take;
-import jp.jyn.jecon.command.Top;
-import jp.jyn.jecon.command.Version;
+import jp.jyn.jecon.command.jecon.Convert;
+import jp.jyn.jecon.command.jecon.Create;
+import jp.jyn.jecon.command.jecon.Give;
+import jp.jyn.jecon.command.jecon.Help;
+import jp.jyn.jecon.command.jecon.Pay;
+import jp.jyn.jecon.command.jecon.Reload;
+import jp.jyn.jecon.command.jecon.Remove;
+import jp.jyn.jecon.command.jecon.Set;
+import jp.jyn.jecon.command.jecon.Show;
+import jp.jyn.jecon.command.jecon.Take;
+import jp.jyn.jecon.command.jecon.Top;
+import jp.jyn.jecon.command.jecon.Version;
+import jp.jyn.jecon.command.pay.PayCommandExecutor;
 import jp.jyn.jecon.config.ConfigLoader;
 import jp.jyn.jecon.config.MainConfig;
 import jp.jyn.jecon.config.MessageConfig;
@@ -133,6 +135,12 @@ public class Jecon extends JavaPlugin {
             .putCommand("version", new Version(message, checker));
         Help help = new Help(message, builder.getSubCommands());
         builder.setErrorExecutor(help).putCommand("help", help);
+
+        // Pay Command
+        PayCommandExecutor payCmd = new PayCommandExecutor(message, registry, repository);
+        getCommand("pay").setExecutor(payCmd);
+        getCommand("pay").setTabCompleter(payCmd);
+
 
         PluginCommand cmd = getCommand("jecon");
         SubExecutor subExecutor = builder.register(cmd);

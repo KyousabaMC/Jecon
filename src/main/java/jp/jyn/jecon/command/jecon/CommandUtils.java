@@ -1,4 +1,4 @@
-package jp.jyn.jecon.command;
+package jp.jyn.jecon.command.jecon;
 
 import jp.jyn.jbukkitlib.util.PackagePrivate;
 import org.bukkit.Bukkit;
@@ -11,13 +11,10 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
-// it is bad practice.
-@PackagePrivate
-class CommandUtils {
+public class CommandUtils {
     private CommandUtils() {}
 
-    @PackagePrivate
-    static BigDecimal parseDecimal(String str) {
+    public static BigDecimal parseDecimal(String str) {
         try {
             return new BigDecimal(str);
         } catch (NumberFormatException ignore) {

@@ -1,4 +1,4 @@
-package jp.jyn.jecon.command;
+package jp.jyn.jecon.command.jecon;
 
 import jp.jyn.jbukkitlib.command.SubCommand;
 import jp.jyn.jbukkitlib.config.parser.template.variable.StringVariable;

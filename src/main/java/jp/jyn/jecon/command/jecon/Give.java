@@ -1,11 +1,11 @@
-package jp.jyn.jecon.command;
+package jp.jyn.jecon.command.jecon;
 
 import jp.jyn.jbukkitlib.command.SubCommand;
 import jp.jyn.jbukkitlib.config.parser.template.variable.StringVariable;
 import jp.jyn.jbukkitlib.config.parser.template.variable.TemplateVariable;
 import jp.jyn.jbukkitlib.uuid.UUIDRegistry;
-import jp.jyn.jecon.config.MessageConfig;
 import jp.jyn.jecon.repository.BalanceRepository;
+import jp.jyn.jecon.config.MessageConfig;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -13,12 +13,12 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Queue;
 
-public class Take extends SubCommand {
+public class Give extends SubCommand {
     private final MessageConfig message;
     private final UUIDRegistry registry;
     private final BalanceRepository repository;
 
-    public Take(MessageConfig message, UUIDRegistry registry, BalanceRepository repository) {
+    public Give(MessageConfig message, UUIDRegistry registry, BalanceRepository repository) {
         this.message = message;
         this.registry = registry;
         this.repository = repository;
@@ -44,8 +44,8 @@ public class Take extends SubCommand {
                 sender.sendMessage(message.accountNotFound.toString(variable));
                 return;
             }
-            repository.withdraw(uuid.get(), amount);
-            sender.sendMessage(message.take.toString(variable.put("amount", repository.format(amount))));
+            repository.deposit(uuid.get(), amount);
+            sender.sendMessage(message.give.toString(variable.put("amount", repository.format(amount))));
         });
         return Result.OK;
     }
@@ -57,7 +57,7 @@ public class Take extends SubCommand {
 
     @Override
     protected String requirePermission() {
-        return "jecon.take";
+        return "jecon.give";
     }
 
     @Override
@@ -68,10 +68,9 @@ public class Take extends SubCommand {
     @Override
     public CommandHelp getHelp() {
         return new CommandHelp(
-            "/money take <player> <amount>",
-            message.help.take.toString(),
-            "/money take notch 100"
+            "/money give <player> <amount>",
+            message.help.give.toString(),
+            "/money give notch 100"
         );
     }
 }
-

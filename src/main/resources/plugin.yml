@@ -12,6 +12,8 @@ commands:
   jecon:
     description: "/jecon help - Show helps."
     aliases: "money"
+  pay:
+    description: "/jecon help - Show helps."
 
 permissions:
   jecon.*:

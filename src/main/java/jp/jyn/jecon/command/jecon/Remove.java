@@ -1,51 +1,47 @@
-package jp.jyn.jecon.command;
+package jp.jyn.jecon.command.jecon;
 
 import jp.jyn.jbukkitlib.command.SubCommand;
 import jp.jyn.jbukkitlib.config.parser.template.variable.StringVariable;
 import jp.jyn.jbukkitlib.config.parser.template.variable.TemplateVariable;
 import jp.jyn.jbukkitlib.uuid.UUIDRegistry;
-import jp.jyn.jecon.repository.BalanceRepository;
 import jp.jyn.jecon.config.MessageConfig;
+import jp.jyn.jecon.repository.BalanceRepository;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
-public class Give extends SubCommand {
+public class Remove extends SubCommand {
     private final MessageConfig message;
     private final UUIDRegistry registry;
     private final BalanceRepository repository;
 
-    public Give(MessageConfig message, UUIDRegistry registry, BalanceRepository repository) {
+    public Remove(MessageConfig message, UUIDRegistry registry, BalanceRepository repository) {
         this.message = message;
         this.registry = registry;
         this.repository = repository;
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     protected Result onCommand(CommandSender sender, Queue<String> args) {
-        String to = args.remove();
-        BigDecimal amount = CommandUtils.parseDecimal(args.element());
-        if (amount == null) {
-            sender.sendMessage(message.invalidArgument.toString("value", args.element()));
-            return Result.OK;
-        }
-
-        registry.getUUIDAsync(to).thenAcceptSync(uuid -> {
-            TemplateVariable variable = StringVariable.init().put("name", to);
+        registry.getUUIDAsync(args.element()).thenAcceptSync(uuid -> {
+            TemplateVariable variable = StringVariable.init().put("name", args.element());
             if (!uuid.isPresent()) {
                 sender.sendMessage(message.playerNotFound.toString(variable));
                 return;
             }
-            if (!repository.hasAccount(uuid.get())) {
+            Optional<BigDecimal> balance = repository.getDecimal(uuid.get());
+            if (!balance.isPresent()) {
                 sender.sendMessage(message.accountNotFound.toString(variable));
                 return;
             }
-            repository.deposit(uuid.get(), amount);
-            sender.sendMessage(message.give.toString(variable.put("amount", repository.format(amount))));
+
+            repository.removeAccount(uuid.get());
+            sender.sendMessage(message.remove.toString(variable.put("balance", repository.format(balance.get()))));
+
         });
         return Result.OK;
     }
@@ -56,21 +52,21 @@ public class Give extends SubCommand {
     }
 
     @Override
-    protected String requirePermission() {
-        return "jecon.give";
+    protected int minimumArgs() {
+        return 1;
     }
 
     @Override
-    protected int minimumArgs() {
-        return 2;
+    protected String requirePermission() {
+        return "jecon.remove";
     }
 
     @Override
     public CommandHelp getHelp() {
         return new CommandHelp(
-            "/money give <player> <amount>",
-            message.help.give.toString(),
-            "/money give notch 100"
+            "/money remove <player>",
+            message.help.remove.toString(),
+            "/money remove notch"
         );
     }
 }

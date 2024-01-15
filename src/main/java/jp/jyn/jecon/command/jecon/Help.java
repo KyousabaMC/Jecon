@@ -1,4 +1,4 @@
-package jp.jyn.jecon.command;
+package jp.jyn.jecon.command.jecon;
 
 import jp.jyn.jbukkitlib.command.ErrorExecutor;
 import jp.jyn.jbukkitlib.command.SubCommand;
