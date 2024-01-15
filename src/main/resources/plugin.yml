@@ -6,7 +6,7 @@ author: "HimaJyun( https://jyn.jp/ )"
 description: "${project.description}"
 load: "STARTUP"
 loadbefore: ["Vault"]
-api-version: "1.15"
+api-version: "1.20"
 
 commands:
   jecon:
