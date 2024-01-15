@@ -1,10 +1,12 @@
 # Jecon
 Economy base plugin for Bukkit/Spigot  
-[日本語解説](https://e-craft.io/bukkit/plugin/jecon/)
+[日本語解説](https://e-craft.io/bukkit/plugin/jecon/)  
+  
+※一部のサーバー向けに作成しています。
 
 ## Features
 * UUID Ready
-* 1.15 Ready
+* 1.20 Ready
 * Vault Ready
 * MySQL(+SQLite) Ready
 * Command tab complete
@@ -12,7 +14,7 @@ Economy base plugin for Bukkit/Spigot
 * API available
 
 ## Installation
-1. [Download this plugin.](https://github.com/HimaJyun/Jecon/releases/latest "Get Jecon")
+1. [Download this plugin.](https://github.com/kuripasanda/Jecon/releases/latest "Get Jecon")
 2. drop in plugins directory.
 3. Server start.
 4. config edit.
@@ -34,27 +36,39 @@ Economy base plugin for Bukkit/Spigot
 |/money reload|jecon.reload|Reload the config.|OP|
 |/money version|jecon.version|Show version and check new version.|OP|
 |/money help|N/A|Show helps.|ALL|
+|/pay &lt;player&gt; &lt;amount&gt;|jecon.pay|`/money pay` alias|ALL|
 
 # API
 ## Maven
 ```xml
 <project>
-    <repositories>
-        <repository>
-            <id>himajyun-repo</id>
-            <url>https://himajyun.github.io/mvn-repo/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
     
     <dependencies>
         <dependency>
-            <groupId>jp.jyn</groupId>
+            <groupId>com.github.kuripasanda</groupId>
             <artifactId>Jecon</artifactId>
-            <version>2.2.1</version>
+            <version>2.2.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
+```
+## Gradle
+```gradle
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        implementation 'com.github.kuripasanda:Jecon:Tag'
+    }
 ```
 
 ## Usage
