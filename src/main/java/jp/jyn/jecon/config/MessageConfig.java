@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MessageConfig {
-    private final static String PREFIX = "[Jecon] ";
+    private final static String PREFIX = ChatColor.translateAlternateColorCodes('&', "&7[&2&l今日鯖&7] &f");
     public final static String HEADER = "========== Jecon ==========";
     public final static String PLAYER_ONLY = PREFIX + ChatColor.RED + "This command can only be run by players.";
 
